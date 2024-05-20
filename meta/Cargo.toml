@@ -1,0 +1,12 @@
+[package]
+name = "rs-liquid-xoxno-meta"
+version = "0.0.0"
+edition = "2021"
+publish = false
+
+[dependencies.rs-liquid-xoxno]
+path = ".."
+
+[dependencies.multiversx-sc-meta]
+version = "0.50.1"
+default-features = false
