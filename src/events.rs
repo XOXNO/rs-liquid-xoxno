@@ -49,7 +49,7 @@ pub trait EventsModule:
     crate::config::ConfigModule
     + multiversx_sc_modules::default_issue_callbacks::DefaultIssueCallbacksModule
 {
-    fn emit_add_liquidity_event(
+    fn emit_delegate_event(
         &self,
         storage_cache: &StorageCache<Self>,
         caller: &ManagedAddress,

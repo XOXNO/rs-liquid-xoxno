@@ -20,8 +20,8 @@ multiversx_sc_wasm_adapter::endpoints! {
     (
         init => init
         upgrade => upgrade
-        delegate => add_liquidity
-        unDelegate => remove_liquidity
+        delegate => delegate
+        unDelegate => un_delegate
         withdraw => withdraw
         addRewards => add_rewards
         getMainTokenAmountForPosition => get_ls_value_for_position

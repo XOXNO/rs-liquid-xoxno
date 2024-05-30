@@ -31,9 +31,12 @@ pub trait RsLiquidXoxno:
 
     #[payable("*")]
     #[endpoint(delegate)]
-    fn add_liquidity(&self) {
+    fn delegate(&self, delegator: OptionalValue<ManagedAddress>) {
         let mut storage_cache = StorageCache::new(self);
-        let caller = self.blockchain().get_caller();
+        let user = match delegator {
+            OptionalValue::Some(user) => user,
+            OptionalValue::None => self.blockchain().get_caller(),
+        };
 
         let staked_tokens = self.call_value().single_esdt();
         require!(
@@ -48,19 +51,14 @@ pub trait RsLiquidXoxno:
 
         let ls_token_amount = self.pool_add_liquidity(&staked_tokens.amount, &mut storage_cache);
         let user_payment = self.mint_ls_token(ls_token_amount);
-        self.send().direct_esdt(
-            &caller,
-            &user_payment.token_identifier,
-            user_payment.token_nonce,
-            &user_payment.amount,
-        );
+        self.tx().to(&user).payment(&user_payment).transfer();
 
-        self.emit_add_liquidity_event(&storage_cache, &caller, user_payment.amount);
+        self.emit_delegate_event(&storage_cache, &user, user_payment.amount);
     }
 
     #[payable("*")]
     #[endpoint(unDelegate)]
-    fn remove_liquidity(&self) {
+    fn un_delegate(&self) {
         let mut storage_cache = StorageCache::new(self);
         let caller = self.blockchain().get_caller();
         let payment = self.call_value().single_esdt();
@@ -96,13 +94,7 @@ pub trait RsLiquidXoxno:
         };
 
         let user_payment = self.mint_unstake_tokens(&virtual_position);
-        self.send().direct_esdt(
-            &caller,
-            &user_payment.token_identifier,
-            user_payment.token_nonce,
-            &user_payment.amount,
-        );
-
+        self.tx().to(&caller).payment(&user_payment).transfer();
         self.emit_remove_liquidity_event(&storage_cache, payment.amount, user_payment.amount);
     }
 
@@ -152,8 +144,10 @@ pub trait RsLiquidXoxno:
             map_unstake.set(&unstake_supply - &unstake_amount);
         }
         self.burn_unstake_tokens(payment.token_nonce);
-        self.send()
-            .direct_esdt(&caller, &storage_cache.main_token_id, 0, &unstake_amount)
+        self.tx()
+            .to(&caller)
+            .single_esdt(&storage_cache.main_token_id, 0, &unstake_amount)
+            .transfer();
     }
 
     #[payable("*")]
