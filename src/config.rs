@@ -8,8 +8,9 @@ pub const UNBOND_PERIOD: u64 = 10;
 #[type_abi]
 #[derive(TopEncode, TopDecode, NestedEncode, NestedDecode, Clone, PartialEq, Eq, Debug)]
 pub struct UnstakeTokenAttributes<M: ManagedTypeApi> {
+    pub original_amount: BigUint<M>,
+    pub share_amount: BigUint<M>,
     pub unstake_epoch: u64,
-    pub unstake_amount: BigUint<M>,
     pub unbond_epoch: u64,
 }
 

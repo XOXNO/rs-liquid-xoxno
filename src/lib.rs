@@ -20,6 +20,7 @@ pub trait RsLiquidXoxno:
     + events::EventsModule
     + multiversx_sc_modules::ongoing_operation::OngoingOperationModule
     + multiversx_sc_modules::default_issue_callbacks::DefaultIssueCallbacksModule
+    + ContractBase
 {
     #[init]
     fn init(&self, main_token: &TokenIdentifier) {
@@ -89,7 +90,8 @@ pub trait RsLiquidXoxno:
 
         let virtual_position = UnstakeTokenAttributes {
             unstake_epoch: current_epoch,
-            unstake_amount: xoxno_to_unstake,
+            original_amount: xoxno_to_unstake,
+            share_amount: payment.amount.clone(),
             unbond_epoch,
         };
 
@@ -126,7 +128,7 @@ pub trait RsLiquidXoxno:
             ERROR_UNSTAKE_PERIOD_NOT_PASSED
         );
 
-        let unstake_amount = unstake_token_attributes.unstake_amount;
+        let unstake_amount = unstake_token_attributes.original_amount;
 
         // Hnadle the case when the user tries to withdraw more than the total withdrawn amount (in case of the last user withdrawal)
         if unstake_amount > storage_cache.total_withdrawn_xoxno {
