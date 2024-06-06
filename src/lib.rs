@@ -103,53 +103,55 @@ pub trait RsLiquidXoxno:
     #[payable("*")]
     #[endpoint(withdraw)]
     fn withdraw(&self) {
-        self.blockchain().check_caller_is_user_account();
         let mut storage_cache = StorageCache::new(self);
         let caller = self.blockchain().get_caller();
-        let payment = self.call_value().single_esdt();
+        let payments = self.call_value().all_esdt_transfers().clone_value();
+        self.unstake_token().require_all_same_token(&payments);
 
         require!(
             self.is_state_active(storage_cache.contract_state),
             ERROR_NOT_ACTIVE
         );
-        require!(
-            payment.token_identifier == self.unstake_token().get_token_id(),
-            ERROR_BAD_PAYMENT_TOKEN
-        );
-        require!(payment.amount > 0, ERROR_BAD_PAYMENT_AMOUNT);
-
-        let unstake_token_attributes: UnstakeTokenAttributes<Self::Api> = self
-            .unstake_token()
-            .get_token_attributes(payment.token_nonce);
-
         let current_epoch = self.blockchain().get_block_epoch();
-        require!(
-            current_epoch >= unstake_token_attributes.unbond_epoch,
-            ERROR_UNSTAKE_PERIOD_NOT_PASSED
-        );
-
-        let unstake_amount = unstake_token_attributes.original_amount;
-
-        // Hnadle the case when the user tries to withdraw more than the total withdrawn amount (in case of the last user withdrawal)
-        if unstake_amount > storage_cache.total_withdrawn_xoxno {
-            storage_cache.total_withdrawn_xoxno = BigUint::from(0u64);
-        } else {
-            storage_cache.total_withdrawn_xoxno -= &unstake_amount;
-        }
-
         let map_unstake = self.unstake_token_supply();
-        let unstake_supply = map_unstake.get();
-        // Handle the case when the user tries to withdraw more than the total supply of the unstake token (in case of the last user withdrawal)
-        if unstake_amount > unstake_supply {
-            map_unstake.set(&BigUint::from(0u64));
-        } else {
-            map_unstake.set(&unstake_supply - &unstake_amount);
+        let mut total_unstaked = BigUint::zero();
+        for payment in payments.iter() {
+            require!(payment.amount > 0, ERROR_BAD_PAYMENT_AMOUNT);
+
+            let unstake_token_attributes: UnstakeTokenAttributes<Self::Api> = self
+                .unstake_token()
+                .get_token_attributes(payment.token_nonce);
+
+            // require!(
+            //     current_epoch >= unstake_token_attributes.unbond_epoch,
+            //     ERROR_UNSTAKE_PERIOD_NOT_PASSED
+            // );
+
+            let unstake_amount = unstake_token_attributes.original_amount;
+
+            // Hnadle the case when the user tries to withdraw more than the total withdrawn amount (in case of the last user withdrawal)
+            if unstake_amount > storage_cache.total_withdrawn_xoxno {
+                storage_cache.total_withdrawn_xoxno = BigUint::from(0u64);
+            } else {
+                storage_cache.total_withdrawn_xoxno -= &unstake_amount;
+            }
+
+            let unstake_supply = map_unstake.get();
+            // Handle the case when the user tries to withdraw more than the total supply of the unstake token (in case of the last user withdrawal)
+            if unstake_amount > unstake_supply {
+                map_unstake.set(&BigUint::from(0u64));
+            } else {
+                map_unstake.set(&unstake_supply - &unstake_amount);
+            }
+            total_unstaked += unstake_amount;
+            self.burn_unstake_tokens(payment.token_nonce);
         }
-        self.burn_unstake_tokens(payment.token_nonce);
-        self.tx()
-            .to(&caller)
-            .single_esdt(&storage_cache.main_token_id, 0, &unstake_amount)
-            .transfer();
+        if total_unstaked > 0 {
+            self.tx()
+                .to(&caller)
+                .single_esdt(&storage_cache.main_token_id, 0, &total_unstaked)
+                .transfer();
+        }
     }
 
     #[payable("*")]
