@@ -7,8 +7,9 @@ pub mod contexts;
 pub mod errors;
 pub mod events;
 pub mod liquidity_pool;
+
 use crate::{
-    config::{UnstakeTokenAttributes, UNBOND_PERIOD},
+    config::{UnstakeTokenAttributes, INITIAL_EXCHANGE_RATE, UNBOND_PERIOD},
     errors::*,
 };
 use contexts::base::*;
@@ -112,7 +113,7 @@ pub trait RsLiquidXoxno:
             self.is_state_active(storage_cache.contract_state),
             ERROR_NOT_ACTIVE
         );
-        let current_epoch = self.blockchain().get_block_epoch();
+        let _current_epoch = self.blockchain().get_block_epoch();
         let map_unstake = self.unstake_token_supply();
         let mut total_unstaked = BigUint::zero();
         for payment in payments.iter() {
@@ -185,5 +186,22 @@ pub trait RsLiquidXoxno:
     fn get_ls_amount_for_position(&self, main_token_amount: BigUint) -> BigUint {
         let storage_cache = StorageCache::new(self);
         self.get_ls_token_amount(&main_token_amount, &storage_cache)
+    }
+
+    #[view(getExchangeRate)]
+    fn get_exchange_rate(&self) -> BigUint {
+        let storage_cache = StorageCache::new(self);
+
+        // The initial exchange rate between EGLD and sEGLD is fixed to one
+        if storage_cache.ls_token_supply.clone() == BigUint::zero() {
+            return BigUint::from(INITIAL_EXCHANGE_RATE);
+        }
+
+        BigUint::from(
+            storage_cache
+                .virtual_xoxno_reserve
+                .clone()
+                .div(storage_cache.ls_token_supply.clone()),
+        )
     }
 }

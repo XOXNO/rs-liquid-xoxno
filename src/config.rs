@@ -4,6 +4,7 @@ multiversx_sc::derive_imports!();
 use crate::liquidity_pool::State;
 
 pub const UNBOND_PERIOD: u64 = 10;
+pub const INITIAL_EXCHANGE_RATE: u64 = 1_000_000_000_000_000_000;
 
 #[type_abi]
 #[derive(TopEncode, TopDecode, NestedEncode, NestedDecode, Clone, PartialEq, Eq, Debug)]

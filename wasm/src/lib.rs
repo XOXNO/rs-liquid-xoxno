@@ -6,9 +6,9 @@
 
 // Init:                                 1
 // Upgrade:                              1
-// Endpoints:                           18
+// Endpoints:                           19
 // Async Callback:                       1
-// Total number of exported functions:  21
+// Total number of exported functions:  22
 
 #![no_std]
 
@@ -26,6 +26,7 @@ multiversx_sc_wasm_adapter::endpoints! {
         addRewards => add_rewards
         getMainTokenAmountForPosition => get_ls_value_for_position
         getLsTokenAmountForMainTokenAmount => get_ls_amount_for_position
+        getExchangeRate => get_exchange_rate
         registerLsToken => register_ls_token
         registerUnstakeToken => register_unstake_token
         setStateActive => set_state_active
