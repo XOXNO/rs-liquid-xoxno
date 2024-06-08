@@ -192,16 +192,12 @@ pub trait RsLiquidXoxno:
     fn get_exchange_rate(&self) -> BigUint {
         let storage_cache = StorageCache::new(self);
 
-        // The initial exchange rate between EGLD and sEGLD is fixed to one
+        // The initial exchange rate between XOXNO and LXOXNO is fixed to one
         if storage_cache.ls_token_supply.clone() == BigUint::zero() {
             return BigUint::from(INITIAL_EXCHANGE_RATE);
         }
 
-        BigUint::from(
-            storage_cache
-                .virtual_xoxno_reserve
-                .clone()
-                .div(storage_cache.ls_token_supply.clone()),
-        )
+        storage_cache.virtual_xoxno_reserve.clone() * BigUint::from(INITIAL_EXCHANGE_RATE)
+            / storage_cache.ls_token_supply.clone()
     }
 }

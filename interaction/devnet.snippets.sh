@@ -37,3 +37,20 @@ setStateActive() {
     --gas-limit=15000000 --send --proxy=${PROXY} --chain=D || return
 }
 
+getExchangeRate() {
+    mxpy --verbose contract query ${ADDRESS} \
+        --proxy=${PROXY} \
+        --function="getExchangeRate"
+}
+
+getLsTokenAmountForMainTokenAmount() {
+    mxpy --verbose contract query ${ADDRESS} \
+        --proxy=${PROXY} \
+        --function="getLsTokenAmountForMainTokenAmount" --arguments 1000000000000000000
+}
+
+getMainTokenAmountForPosition() {
+    mxpy --verbose contract query ${ADDRESS} \
+        --proxy=${PROXY} \
+        --function="getMainTokenAmountForPosition" --arguments 892262748273425358
+}
