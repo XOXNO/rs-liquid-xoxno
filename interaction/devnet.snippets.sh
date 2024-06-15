@@ -1,6 +1,6 @@
 ADDRESS=erd1qqqqqqqqqqqqqpgq04vxf48vdlr97p3jz73qtxlf4l9p8rezah0s37nzrm
 PROXY=https://devnet-gateway.xoxno.com
-PROJECT="/Users/mihaieremia/GitHub/rs-liquid-xoxno/output/rs-liquid-xoxno.wasm"
+PROJECT="./output-docker/rs-liquid-xoxno/rs-liquid-xoxno.wasm"
 
 deploy() {
     mxpy contract deploy --bytecode=${PROJECT} --arguments str:XOXNO-589e09 --recall-nonce \
@@ -53,4 +53,10 @@ getMainTokenAmountForPosition() {
     mxpy --verbose contract query ${ADDRESS} \
         --proxy=${PROXY} \
         --function="getMainTokenAmountForPosition" --arguments 892262748273425358
+}
+
+verifyContract() {
+    mxpy --verbose contract verify "${ADDRESS}"  \
+    --packaged-src=./output-docker/rs-liquid-xoxno/rs-liquid-xoxno-0.0.0.source.json --verifier-url="https://devnet-play-api.multiversx.com" \
+    --docker-image="multiversx/sdk-rust-contract-builder:v8.0.0" --ledger --ledger-account-index=0 --ledger-address-index=0  || return 
 }
