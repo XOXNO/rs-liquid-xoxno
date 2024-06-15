@@ -1,6 +1,6 @@
-ADDRESS=erd1qqqqqqqqqqqqqpgqscgww6dn8029mm0gyflu3ksep78decapah0s46nj67
-PROXY=https://gateway.multiversx.com
-PROJECT="/Users/mihaieremia/GitHub/rs-accumulator/output/accumulator.wasm"
+ADDRESS=
+PROXY=https://gateway.xoxno.com
+PROJECT="/Users/mihaieremia/GitHub/rs-liquid-xoxno/output/rs-liquid-xoxno.wasm"
 
 deploy() {
     mxpy contract deploy --bytecode=${PROJECT} --recall-nonce \

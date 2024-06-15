@@ -113,7 +113,7 @@ pub trait RsLiquidXoxno:
             self.is_state_active(storage_cache.contract_state),
             ERROR_NOT_ACTIVE
         );
-        let _current_epoch = self.blockchain().get_block_epoch();
+        let current_epoch = self.blockchain().get_block_epoch();
         let map_unstake = self.unstake_token_supply();
         let mut total_unstaked = BigUint::zero();
         for payment in payments.iter() {
@@ -123,10 +123,10 @@ pub trait RsLiquidXoxno:
                 .unstake_token()
                 .get_token_attributes(payment.token_nonce);
 
-            // require!(
-            //     current_epoch >= unstake_token_attributes.unbond_epoch,
-            //     ERROR_UNSTAKE_PERIOD_NOT_PASSED
-            // );
+            require!(
+                current_epoch >= unstake_token_attributes.unbond_epoch,
+                ERROR_UNSTAKE_PERIOD_NOT_PASSED
+            );
 
             let unstake_amount = unstake_token_attributes.original_amount;
 
@@ -138,7 +138,7 @@ pub trait RsLiquidXoxno:
             }
 
             let unstake_supply = map_unstake.get();
-            // Handle the case when the user tries to withdraw more than the total supply of the unstake token (in case of the last user withdrawal)
+            // Handle the case when the user tries to withdraw more than the total supply of the unstake token (in case of the last user withdrawal, marginal error)
             if unstake_amount > unstake_supply {
                 map_unstake.set(&BigUint::from(0u64));
             } else {
