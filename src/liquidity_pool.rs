@@ -6,8 +6,6 @@ use crate::errors::*;
 
 use super::config;
 
-const MINIMUM_LIQUIDITY: u64 = 0;
-
 pub const UNDELEGATE_TOKEN_URI: &[u8] =
     b"https://ipfs.io/ipfs/QmY4jtQh6M24uAFR3LcyV7QmL8pkL6zFxXyPXBuzo5sdX5";
 
@@ -26,14 +24,7 @@ pub trait LiquidityPoolModule:
         token_amount: &BigUint,
         storage_cache: &mut StorageCache<Self>,
     ) -> BigUint {
-        let ls_amount = if storage_cache.virtual_xoxno_reserve > 0 {
-            token_amount.clone() * &storage_cache.ls_token_supply
-                / &storage_cache.virtual_xoxno_reserve
-        } else {
-            token_amount.clone()
-        };
-
-        require!(ls_amount > 0, ERROR_INSUFFICIENT_LIQUIDITY);
+        let ls_amount = self.get_ls_token_amount(token_amount, &storage_cache);
 
         storage_cache.ls_token_supply += &ls_amount;
         storage_cache.virtual_xoxno_reserve += token_amount;
@@ -59,7 +50,7 @@ pub trait LiquidityPoolModule:
         storage_cache: &StorageCache<Self>,
     ) -> BigUint {
         require!(
-            storage_cache.ls_token_supply >= ls_token_amount + MINIMUM_LIQUIDITY,
+            &storage_cache.ls_token_supply >= ls_token_amount,
             ERROR_NOT_ENOUGH_LP
         );
 
