@@ -6,9 +6,9 @@
 
 // Init:                                 1
 // Upgrade:                              1
-// Endpoints:                           19
+// Endpoints:                           18
 // Async Callback:                       1
-// Total number of exported functions:  22
+// Total number of exported functions:  21
 
 #![no_std]
 
@@ -36,7 +36,6 @@ multiversx_sc_wasm_adapter::endpoints! {
         getMainToken => main_token
         getLsSupply => ls_token_supply
         getVirtualXOXNOReserve => virtual_xoxno_reserve
-        getTotalWithdrawnXOXNO => total_withdrawn_xoxno
         getUnstakeTokenId => unstake_token
         getUnstakeTokenSupply => unstake_token_supply
     )

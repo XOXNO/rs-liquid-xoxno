@@ -8,6 +8,9 @@ use super::config;
 
 const MINIMUM_LIQUIDITY: u64 = 0;
 
+pub const UNDELEGATE_TOKEN_URI: &[u8] =
+    b"https://ipfs.io/ipfs/QmY4jtQh6M24uAFR3LcyV7QmL8pkL6zFxXyPXBuzo5sdX5";
+
 #[derive(TypeAbi, TopEncode, TopDecode, PartialEq, Eq, Copy, Clone, Debug)]
 pub enum State {
     Inactive,
@@ -101,8 +104,13 @@ pub trait LiquidityPoolModule:
     }
 
     fn mint_unstake_tokens<T: TopEncode>(&self, attributes: &T) -> EsdtTokenPayment<Self::Api> {
-        self.unstake_token()
-            .nft_create(BigUint::from(1u64), attributes)
+        let token_map = self.unstake_token();
+        let nft = token_map.nft_create(BigUint::from(1u64), attributes);
+
+        let uri = ManagedBuffer::from(UNDELEGATE_TOKEN_URI);
+        self.send()
+            .nft_add_uri(token_map.get_token_id_ref(), nft.token_nonce, uri);
+        nft
     }
 
     fn burn_unstake_tokens(&self, token_nonce: u64) {

@@ -13,7 +13,7 @@ where
     pub ls_token_id: TokenIdentifier<C::Api>,
     pub ls_token_supply: BigUint<C::Api>,
     pub virtual_xoxno_reserve: BigUint<C::Api>,
-    pub total_withdrawn_xoxno: BigUint<C::Api>,
+    pub total_unstaked_xoxno: BigUint<C::Api>,
 }
 
 impl<'a, C> StorageCache<'a, C>
@@ -27,7 +27,7 @@ where
             ls_token_id: sc_ref.ls_token().get_token_id(),
             ls_token_supply: sc_ref.ls_token_supply().get(),
             virtual_xoxno_reserve: sc_ref.virtual_xoxno_reserve().get(),
-            total_withdrawn_xoxno: sc_ref.total_withdrawn_xoxno().get(),
+            total_unstaked_xoxno: sc_ref.unstake_token_supply().get(),
             sc_ref,
         }
     }
@@ -44,7 +44,7 @@ where
             .virtual_xoxno_reserve()
             .set(&self.virtual_xoxno_reserve);
         self.sc_ref
-            .total_withdrawn_xoxno()
-            .set(&self.total_withdrawn_xoxno);
+            .unstake_token_supply()
+            .set(&self.total_unstaked_xoxno);
     }
 }

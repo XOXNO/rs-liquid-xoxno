@@ -7,6 +7,7 @@ pub mod contexts;
 pub mod errors;
 pub mod events;
 pub mod liquidity_pool;
+pub mod rs_xoxno_proxy;
 
 use crate::{
     config::{UnstakeTokenAttributes, INITIAL_EXCHANGE_RATE, UNBOND_PERIOD},
@@ -86,8 +87,7 @@ pub trait RsLiquidXoxno:
         let current_epoch = self.blockchain().get_block_epoch();
         let unbond_epoch = current_epoch + UNBOND_PERIOD;
 
-        self.unstake_token_supply()
-            .update(|x| *x += &xoxno_to_unstake);
+        storage_cache.total_unstaked_xoxno += &xoxno_to_unstake;
 
         let virtual_position = UnstakeTokenAttributes {
             unstake_epoch: current_epoch,
@@ -95,7 +95,6 @@ pub trait RsLiquidXoxno:
             share_amount: payment.amount.clone(),
             unbond_epoch,
         };
-
         let user_payment = self.mint_unstake_tokens(&virtual_position);
         self.tx().to(&caller).payment(&user_payment).transfer();
         self.emit_remove_liquidity_event(&storage_cache, payment.amount, user_payment.amount);
@@ -114,7 +113,6 @@ pub trait RsLiquidXoxno:
             ERROR_NOT_ACTIVE
         );
         let current_epoch = self.blockchain().get_block_epoch();
-        let map_unstake = self.unstake_token_supply();
         let mut total_unstaked = BigUint::zero();
         for payment in payments.iter() {
             require!(payment.amount > 0, ERROR_BAD_PAYMENT_AMOUNT);
@@ -131,19 +129,12 @@ pub trait RsLiquidXoxno:
             let unstake_amount = unstake_token_attributes.original_amount;
 
             // Hnadle the case when the user tries to withdraw more than the total withdrawn amount (in case of the last user withdrawal)
-            if unstake_amount > storage_cache.total_withdrawn_xoxno {
-                storage_cache.total_withdrawn_xoxno = BigUint::from(0u64);
+            if unstake_amount > storage_cache.total_unstaked_xoxno {
+                storage_cache.total_unstaked_xoxno = BigUint::from(0u64);
             } else {
-                storage_cache.total_withdrawn_xoxno -= &unstake_amount;
+                storage_cache.total_unstaked_xoxno -= &unstake_amount;
             }
 
-            let unstake_supply = map_unstake.get();
-            // Handle the case when the user tries to withdraw more than the total supply of the unstake token (in case of the last user withdrawal, marginal error)
-            if unstake_amount > unstake_supply {
-                map_unstake.set(&BigUint::from(0u64));
-            } else {
-                map_unstake.set(&unstake_supply - &unstake_amount);
-            }
             total_unstaked += unstake_amount;
             self.burn_unstake_tokens(payment.token_nonce);
         }

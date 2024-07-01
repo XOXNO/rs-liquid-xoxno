@@ -1,4 +1,3 @@
-pub static ERROR_ACTIVE: &[u8] = b"Active state";
 pub static ERROR_NOT_ACTIVE: &[u8] = b"Not active";
 pub static ERROR_LS_TOKEN_NOT_ISSUED: &[u8] = b"LS token not issued";
 

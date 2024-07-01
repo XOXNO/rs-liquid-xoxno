@@ -95,10 +95,6 @@ pub trait ConfigModule:
     #[storage_mapper("virtualXOXNOReserve")]
     fn virtual_xoxno_reserve(&self) -> SingleValueMapper<BigUint>;
 
-    #[view(getTotalWithdrawnXOXNO)]
-    #[storage_mapper("totalWithdrawnXOXNO")]
-    fn total_withdrawn_xoxno(&self) -> SingleValueMapper<BigUint>;
-
     #[view(getUnstakeTokenId)]
     #[storage_mapper("unstakeTokenId")]
     fn unstake_token(&self) -> NonFungibleTokenMapper<Self::Api>;
