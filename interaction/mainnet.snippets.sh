@@ -14,7 +14,7 @@ upgrade() {
     echo "Upgrade smart contract address: ${ADDRESS}"
     mxpy  contract upgrade ${ADDRESS} --bytecode=${PROJECT} --recall-nonce \
     --ledger --ledger-account-index=0 --ledger-address-index=7 \
-    --gas-limit=150000000 --send --proxy=${PROXY} --chain="1" || return
+    --gas-limit=55000000 --send --proxy=${PROXY} --chain="1" || return
 }
 
 registerLsToken() {

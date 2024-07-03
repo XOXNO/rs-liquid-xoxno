@@ -56,7 +56,7 @@ pub trait RsLiquidXoxno:
         let user_payment = self.mint_ls_token(ls_token_amount);
         self.tx().to(&user).payment(&user_payment).transfer();
 
-        self.emit_delegate_event(&storage_cache, &user, user_payment.amount);
+        self.emit_delegate_event(&storage_cache, &user, user_payment.amount, staked_tokens.amount);
     }
 
     #[payable("*")]
@@ -91,13 +91,18 @@ pub trait RsLiquidXoxno:
 
         let virtual_position = UnstakeTokenAttributes {
             unstake_epoch: current_epoch,
-            original_amount: xoxno_to_unstake,
+            original_amount: xoxno_to_unstake.clone(),
             share_amount: payment.amount.clone(),
             unbond_epoch,
         };
         let user_payment = self.mint_unstake_tokens(&virtual_position);
         self.tx().to(&caller).payment(&user_payment).transfer();
-        self.emit_remove_liquidity_event(&storage_cache, payment.amount, user_payment.amount);
+        self.emit_remove_liquidity_event(
+            &storage_cache,
+            user_payment,
+            payment.amount,
+            xoxno_to_unstake.clone(),
+        );
     }
 
     #[payable("*")]
