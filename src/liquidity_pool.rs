@@ -9,7 +9,8 @@ use super::config;
 pub const UNDELEGATE_TOKEN_URI: &[u8] =
     b"https://ipfs.io/ipfs/QmY4jtQh6M24uAFR3LcyV7QmL8pkL6zFxXyPXBuzo5sdX5";
 
-#[derive(TypeAbi, TopEncode, TopDecode, PartialEq, Eq, Copy, Clone, Debug)]
+#[type_abi]
+#[derive(TopEncode, TopDecode, PartialEq, Eq, Copy, Clone, Debug)]
 pub enum State {
     Inactive,
     Active,
