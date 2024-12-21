@@ -58,5 +58,9 @@ getMainTokenAmountForPosition() {
 verifyContract() {
     mxpy --verbose contract verify "${ADDRESS}"  \
     --packaged-src=./output-docker/rs-liquid-xoxno/rs-liquid-xoxno-0.0.0.source.json --verifier-url="https://devnet-play-api.multiversx.com" \
-    --docker-image="multiversx/sdk-rust-contract-builder:v8.0.0" --ledger --ledger-account-index=0 --ledger-address-index=0  || return 
+    --docker-image="multiversx/sdk-rust-contract-builder:v8.0.1" --ledger --ledger-account-index=0 --ledger-address-index=0  || return 
+}
+
+buildDocker() {
+    mxpy contract reproducible-build --docker-image="multiversx/sdk-rust-contract-builder:v8.0.1"
 }

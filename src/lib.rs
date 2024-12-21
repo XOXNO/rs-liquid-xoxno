@@ -13,7 +13,7 @@ use crate::{
     config::{UnstakeTokenAttributes, INITIAL_EXCHANGE_RATE, UNBOND_PERIOD},
     errors::*,
 };
-use contexts::base::*;
+use contexts::{base::*, readonly::ReadOnlyStorageCache};
 
 #[multiversx_sc::contract]
 pub trait RsLiquidXoxno:
@@ -56,7 +56,12 @@ pub trait RsLiquidXoxno:
         let user_payment = self.mint_ls_token(ls_token_amount);
         self.tx().to(&user).payment(&user_payment).transfer();
 
-        self.emit_delegate_event(&storage_cache, &user, user_payment.amount, staked_tokens.amount);
+        self.emit_delegate_event(
+            &storage_cache,
+            &user,
+            user_payment.amount,
+            staked_tokens.amount,
+        );
     }
 
     #[payable("*")]
@@ -174,19 +179,19 @@ pub trait RsLiquidXoxno:
 
     #[view(getMainTokenAmountForPosition)]
     fn get_ls_value_for_position(&self, ls_token_amount: BigUint) -> BigUint {
-        let storage_cache = StorageCache::new(self);
-        self.get_xoxno_amount(&ls_token_amount, &storage_cache)
+        let storage_cache = ReadOnlyStorageCache::new(self);
+        self.get_xoxno_amount_read_only(&ls_token_amount, &storage_cache)
     }
 
     #[view(getLsTokenAmountForMainTokenAmount)]
     fn get_ls_amount_for_position(&self, main_token_amount: BigUint) -> BigUint {
-        let storage_cache = StorageCache::new(self);
-        self.get_ls_token_amount(&main_token_amount, &storage_cache)
+        let storage_cache = ReadOnlyStorageCache::new(self);
+        self.get_ls_token_amount_readonly(&main_token_amount, &storage_cache)
     }
 
     #[view(getExchangeRate)]
     fn get_exchange_rate(&self) -> BigUint {
-        let storage_cache = StorageCache::new(self);
+        let storage_cache = ReadOnlyStorageCache::new(self);
 
         // The initial exchange rate between XOXNO and LXOXNO is fixed to one
         if storage_cache.ls_token_supply.clone() == BigUint::zero() {

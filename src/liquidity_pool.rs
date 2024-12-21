@@ -2,6 +2,7 @@ multiversx_sc::imports!();
 multiversx_sc::derive_imports!();
 
 use crate::contexts::base::StorageCache;
+use crate::contexts::readonly::ReadOnlyStorageCache;
 use crate::errors::*;
 
 use super::config;
@@ -62,10 +63,52 @@ pub trait LiquidityPoolModule:
         xoxno_amount
     }
 
+    fn get_xoxno_amount_read_only(
+        &self,
+        ls_token_amount: &BigUint,
+        storage_cache: &ReadOnlyStorageCache<Self>,
+    ) -> BigUint {
+        require!(
+            &storage_cache.ls_token_supply >= ls_token_amount,
+            ERROR_NOT_ENOUGH_LP
+        );
+
+        let xoxno_amount =
+            ls_token_amount * &storage_cache.virtual_xoxno_reserve / &storage_cache.ls_token_supply;
+        require!(xoxno_amount > 0u64, ERROR_INSUFFICIENT_LIQ_BURNED);
+
+        xoxno_amount
+    }
+
     fn get_ls_token_amount(
         &self,
         token_amount: &BigUint,
         storage_cache: &StorageCache<Self>,
+    ) -> BigUint {
+        // Ensure the provided token_amount is greater than 0
+        require!(
+            token_amount > &BigUint::from(0u64),
+            ERROR_INSUFFICIENT_LIQ_BURNED
+        );
+
+        // Calculate the ls_token_amount based on the provided token_amount and including rewards
+        let ls_token_amount = if storage_cache.virtual_xoxno_reserve > 0 {
+            token_amount.clone() * &storage_cache.ls_token_supply
+                / &storage_cache.virtual_xoxno_reserve
+        } else {
+            token_amount.clone()
+        };
+
+        // Ensure that the calculated ls_token_amount is greater than zero
+        require!(ls_token_amount > 0, ERROR_INSUFFICIENT_LIQUIDITY);
+
+        ls_token_amount
+    }
+
+    fn get_ls_token_amount_readonly(
+        &self,
+        token_amount: &BigUint,
+        storage_cache: &ReadOnlyStorageCache<Self>,
     ) -> BigUint {
         // Ensure the provided token_amount is greater than 0
         require!(

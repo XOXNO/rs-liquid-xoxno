@@ -60,3 +60,7 @@ verifyContract() {
     --packaged-src=./output-docker/rs-liquid-xoxno/rs-liquid-xoxno-0.0.0.source.json --verifier-url="https://play-api.multiversx.com" \
     --docker-image="multiversx/sdk-rust-contract-builder:v8.0.0" --ledger --ledger-account-index=0 --ledger-address-index=7  || return 
 }
+
+buildDocker() {
+    mxpy contract reproducible-build --docker-image="multiversx/sdk-rust-contract-builder:v8.0.1"
+}
