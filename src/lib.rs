@@ -60,7 +60,7 @@ pub trait RsLiquidXoxno:
             &storage_cache,
             &user,
             user_payment.amount,
-            staked_tokens.amount,
+            &staked_tokens.amount,
         );
     }
 
@@ -105,7 +105,7 @@ pub trait RsLiquidXoxno:
         self.emit_remove_liquidity_event(
             &storage_cache,
             user_payment,
-            payment.amount,
+            &payment.amount,
             xoxno_to_unstake.clone(),
         );
     }
@@ -172,9 +172,9 @@ pub trait RsLiquidXoxno:
             self.is_state_active(storage_cache.contract_state),
             ERROR_NOT_ACTIVE
         );
-        storage_cache.virtual_xoxno_reserve += staked_tokens.amount.clone();
+        storage_cache.virtual_xoxno_reserve += &staked_tokens.amount;
 
-        self.emit_add_rewards_event(&storage_cache, &caller, staked_tokens.amount);
+        self.emit_add_rewards_event(&storage_cache, &caller, &staked_tokens.amount);
     }
 
     #[view(getMainTokenAmountForPosition)]
