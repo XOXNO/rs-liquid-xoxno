@@ -9,16 +9,16 @@ publish = false
 path = "src/lib.rs"
 
 [dependencies.multiversx-sc]
-version = "0.55.0"
+version = "0.56.0"
 
 [dev-dependencies]
 num-bigint = "0.4.6"
 
 [dependencies.multiversx-sc-modules]
-version = "0.55.0"
+version = "0.56.0"
 
 [dev-dependencies.multiversx-sc-scenario]
-version = "0.55.0"
+version = "0.56.0"
 
 [workspace]
 members = [
