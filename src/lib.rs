@@ -34,7 +34,7 @@ pub trait RsLiquidXoxno:
 
     #[payable("*")]
     #[endpoint(delegate)]
-    fn delegate(&self, delegator: OptionalValue<ManagedAddress>) {
+    fn delegate(&self, delegator: OptionalValue<ManagedAddress>) -> EsdtTokenPayment {
         let mut storage_cache = StorageCache::new(self);
         let user = match delegator {
             OptionalValue::Some(user) => user,
@@ -59,9 +59,11 @@ pub trait RsLiquidXoxno:
         self.emit_delegate_event(
             &storage_cache,
             &user,
-            user_payment.amount,
+            &user_payment.amount,
             &staked_tokens.amount,
         );
+
+        user_payment
     }
 
     #[payable("*")]

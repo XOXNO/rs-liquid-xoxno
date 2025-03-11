@@ -54,7 +54,7 @@ pub trait EventsModule:
         &self,
         storage_cache: &StorageCache<Self>,
         caller: &ManagedAddress,
-        ls_token_amount: BigUint,
+        ls_token_amount: &BigUint,
         original_amount: &BigUint,
     ) {
         let epoch = self.blockchain().get_block_epoch();
@@ -65,7 +65,7 @@ pub trait EventsModule:
             &AddLiquidityEvent {
                 caller: caller.clone(),
                 ls_token_id: storage_cache.ls_token_id.clone(),
-                ls_token_amount,
+                ls_token_amount: ls_token_amount.clone(),
                 ls_token_supply: storage_cache.ls_token_supply.clone(),
                 original_amount: original_amount.clone(),
                 virtual_xoxno_reserve: storage_cache.virtual_xoxno_reserve.clone(),
