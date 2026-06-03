@@ -16,7 +16,7 @@ pub fn init_world() -> ScenarioWorld {
     blockchain
 }
 
-pub fn deploy_contract(world: &mut ScenarioWorld) -> TestSCAddress {
+pub fn deploy_contract(world: &mut ScenarioWorld) -> TestSCAddress<'_> {
     let liquid_sc = world.code_expression(&CODE_PATH.eval_to_expr());
     let mut acc = Account::new().code(liquid_sc).owner(OWNER_ADDRESS);
 

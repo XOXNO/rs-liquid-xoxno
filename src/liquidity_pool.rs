@@ -26,7 +26,7 @@ pub trait LiquidityPoolModule:
         token_amount: &BigUint,
         storage_cache: &mut StorageCache<Self>,
     ) -> BigUint {
-        let ls_amount = self.get_ls_token_amount(token_amount, &storage_cache);
+        let ls_amount = self.get_ls_token_amount(token_amount, storage_cache);
 
         storage_cache.ls_token_supply += &ls_amount;
         storage_cache.virtual_xoxno_reserve += token_amount;

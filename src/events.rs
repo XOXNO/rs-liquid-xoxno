@@ -71,7 +71,7 @@ pub trait EventsModule:
                 virtual_xoxno_reserve: storage_cache.virtual_xoxno_reserve.clone(),
                 block: self.blockchain().get_block_nonce(),
                 epoch,
-                timestamp: self.blockchain().get_block_timestamp(),
+                timestamp: self.blockchain().get_block_timestamp_seconds().as_u64_seconds(),
             },
         )
     }
@@ -99,7 +99,7 @@ pub trait EventsModule:
                 virtual_xoxno_reserve: storage_cache.virtual_xoxno_reserve.clone(),
                 block: self.blockchain().get_block_nonce(),
                 epoch,
-                timestamp: self.blockchain().get_block_timestamp(),
+                timestamp: self.blockchain().get_block_timestamp_seconds().as_u64_seconds(),
             },
         )
     }
@@ -123,7 +123,7 @@ pub trait EventsModule:
                 rewards_amount: reward_amount.clone(),
                 block: self.blockchain().get_block_nonce(),
                 epoch,
-                timestamp: self.blockchain().get_block_timestamp(),
+                timestamp: self.blockchain().get_block_timestamp_seconds().as_u64_seconds(),
             },
         )
     }
